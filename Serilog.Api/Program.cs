@@ -1,5 +1,5 @@
-
 using Serilog.Aplicacao.Util;
+using Serilog.Events;
 
 namespace Serilog.Api
 {
@@ -9,7 +9,7 @@ namespace Serilog.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+ 
 
             builder.Services.AddControllers();
 
@@ -17,32 +17,31 @@ namespace Serilog.Api
             builder.Services.AddSwaggerGen();
 
 
-
-
             // Configura o Serilog
-            SerilogConfig.ConfigurarSerilog();
+           SerilogConfig.ConfigurarSerilog();
             builder.Host.UseSerilog();
-
-
-
-
-
+  
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
+
+
+            // Redirecionar a raiz "/" para "/swagger"
+            app.MapGet("/", context =>
+            {
+                context.Response.Redirect("/swagger");
+                return Task.CompletedTask;
+            });
+
+
+            app.UseHsts();
+            app.UseStaticFiles();
+            app.UseRouting();
+ 
 
             app.Run();
         }

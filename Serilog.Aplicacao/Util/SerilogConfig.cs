@@ -7,50 +7,28 @@ namespace Serilog.Aplicacao.Util
         public static void ConfigurarSerilog()
         {
 
+
+
+ 
+
             // Obtenha a chave do Application Insights  variáveis de ambiente
-            string applicationInsightsChave = Environment.GetEnvironmentVariable("APPINSIGHTS_CHAVE") ?? string.Empty;
-            if (!string.IsNullOrEmpty(applicationInsightsChave))
+            string azure = Environment.GetEnvironmentVariable("LOG_AZURE") ?? string.Empty;
+            if (!string.IsNullOrEmpty(azure))
             {
-                Log.Logger = new LoggerConfiguration().MinimumLevel.Verbose()
 
-                //// Logs Warning
-                //.WriteTo.Logger(lc => lc
-                //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Warning)
-                //    .WriteTo.File(
-                //        path: @"D:\home\LogFiles\warning-.log",
-                //        rollingInterval: RollingInterval.Day,
-                //        retainedFileCountLimit: 30))
+               
+                Log.Logger = new LoggerConfiguration()
+                    .MinimumLevel.Verbose()
+                    // Para ver no Log Stream
+                    .WriteTo.Console()
+                    // Para salvar em arquivos persistentes no Azure
+                    .WriteTo.File(
+                        path: @"D:\home\LogFiles\warning-and-above-.log",
+                        restrictedToMinimumLevel: LogEventLevel.Warning,
+                        rollingInterval: RollingInterval.Day)
+                    .CreateLogger();
 
-                //// Logs Error
-                //.WriteTo.Logger(lc => lc
-                //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Error)
-                //    .WriteTo.File(
-                //        path: @"D:\home\LogFiles\error-.log",
-                //        rollingInterval: RollingInterval.Day,
-                //        retainedFileCountLimit: 30))
-
-                //// Logs Critical
-                //.WriteTo.Logger(lc => lc
-                //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Fatal)
-                //    .WriteTo.File(
-                //        path: @"D:\home\LogFiles\critical-.log",
-                //        rollingInterval: RollingInterval.Day,
-                //        retainedFileCountLimit: 30))
-
-                // Logs Warning e acima (Warning, Error, Fatal) num arquivo agregado
-                .WriteTo.File(
-                    path: @"D:\home\LogFiles\warning-and-above-.log",
-                    restrictedToMinimumLevel: LogEventLevel.Warning,
-                    rollingInterval: RollingInterval.Day)
-
-                // Log no console (Azure Log Stream)
-                .WriteTo.Console()
-
-                // Log para Application Insights (somente erros e acima)
-                //No Serilog, quando você usa o parâmetro LogEventLevel.Error no .WriteTo.ApplicationInsights(...), ele significa o nível mínimo de log que será enviado para o Application Insights — ou seja, todos os logs de nível Error e acima (Error, Fatal) serão enviados, mas Warning NÃO será enviado.
-                //Resumo da hierarquia de níveis(do mais baixo ao mais alto): Verbose < Debug < Information < Warning < Error < Fatal
-                .WriteTo.ApplicationInsights(applicationInsightsChave, TelemetryConverter.Traces, LogEventLevel.Warning)
-                .CreateLogger();
+                Log.Information("Log de teste no Azure Log Stream!");
             }
             else
             {
@@ -124,6 +102,7 @@ namespace Serilog.Aplicacao.Util
 
         public static void Info(string message)
         {
+            Log.Information("Log de teste no Azure Log Stream!");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"[INFO] {message}");
             Console.ResetColor();
@@ -131,6 +110,7 @@ namespace Serilog.Aplicacao.Util
 
         public static void Success(string message)
         {
+            Log.Information("Log de teste no Azure Log Stream!");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"[SUCESSO] {message}");
             Console.ResetColor();
@@ -138,6 +118,7 @@ namespace Serilog.Aplicacao.Util
 
         public static void Warning(string message)
         {
+            Log.Information("Log de teste no Azure Log Stream!");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"[AVISO] {message}");
             Console.ResetColor();
@@ -145,6 +126,7 @@ namespace Serilog.Aplicacao.Util
 
         public static void Error(string message)
         {
+            Log.Information("Log de teste no Azure Log Stream!");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"[ERRO] {message}");
             Console.ResetColor();
@@ -152,3 +134,8 @@ namespace Serilog.Aplicacao.Util
     }
 }
 
+
+
+
+
+ 

@@ -20,6 +20,17 @@ namespace Serilog.Api.Controllers
         }
 
 
+        [HttpGet("log")]
+        public IActionResult LogTeste()
+        {
+            Log.Information("Chamou endpoint /api/teste/log");
+            Log.Warning("Exemplo de warning");
+            Log.Error("Exemplo de erro");
+            return Ok("Logs enviados!");
+        }
+
+
+
         [LoggerMessage(EventId = 1001, Level = LogLevel.Information, Message = "Buscando usuário com id {id}")]
         partial void LogBuscarUsuario(int? id);
 
