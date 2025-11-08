@@ -16,4 +16,8 @@
     <PackageReference Include="Serilog.Sinks.Trace" Version="4.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Util\" />
+  </ItemGroup>
+
 </Project>

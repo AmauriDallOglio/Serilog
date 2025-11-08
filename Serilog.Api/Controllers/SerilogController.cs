@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Serilog.Aplicacao.Dto;
-using Serilog.Aplicacao.Util;
 
 namespace Serilog.Api.Controllers
 {
@@ -16,16 +15,40 @@ namespace Serilog.Api.Controllers
         public SerilogController(ILogger<SerilogController> logger)
         {
             _logger = logger;
-
+            _logger.LogInformation("#############################################################################");
+            _logger.LogInformation("                            SerilogController                                ");
+            _logger.LogInformation("#############################################################################");
+            _logger.LogInformation($"Logger type: {_logger.GetType().FullName}");
         }
 
 
         [HttpGet("log")]
         public IActionResult LogTeste()
         {
-            Log.Information("Chamou endpoint /api/teste/log");
-            Log.Warning("Exemplo de warning");
-            Log.Error("Exemplo de erro");
+            _logger.LogInformation("#############################################################################");
+            _logger.LogInformation("                              Rota: LogTeste                                 ");
+            _logger.LogInformation("#############################################################################");
+
+            _logger.LogInformation("-----------------------------------------------------------------------------");
+            _logger.LogInformation("SerilogController: iniciado");
+            _logger.LogWarning("SerilogController: Chamou endpoint /api/teste/log");
+            _logger.LogInformation("-----------------------------------------------------------------------------");
+
+            _logger.LogWarning("-----------------------------------------------------------------------------");
+            _logger.LogWarning("SerilogController: iniciou com um warning");
+            _logger.LogWarning("SerilogController: Exemplo de warning");
+            _logger.LogWarning("-----------------------------------------------------------------------------");
+
+            _logger.LogError("-----------------------------------------------------------------------------");
+            _logger.LogError("SerilogController: iniciou com erro simulado");
+            _logger.LogWarning("SerilogController: Exemplo de erro");
+            _logger.LogError("-----------------------------------------------------------------------------");
+
+            _logger.LogError("-----------------------------------------------------------------------------");
+            _logger.LogInformation($"Logger type: {_logger.GetType().FullName}");
+            _logger.LogError("-----------------------------------------------------------------------------");
+
+
             return Ok("Logs enviados!");
         }
 
@@ -38,7 +61,7 @@ namespace Serilog.Api.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> ObterPorId(int? id, CancellationToken cancellationToken)
         {
-            SerilogConfig.Info("Iniciando execução...");
+           // SerilogConfig.Info("Iniciando execução...");
             _logger.LogTrace("Iniciando busca de usuário. Parâmetro id recebido: {id}", id);
             _logger.LogDebug("Preparando consulta para o id {id} no método {Method}", id, nameof(ObterPorId));
 
@@ -59,7 +82,7 @@ namespace Serilog.Api.Controllers
                 {
                     _logger.LogCritical("Erro crítico: Usuário com id {id} causou falha no sistema", id);
                 }
-                SerilogConfig.Error("Processo finalizado!");
+              //  SerilogConfig.Error("Processo finalizado!");
                 return NotFound();
             }
 
@@ -67,7 +90,7 @@ namespace Serilog.Api.Controllers
 
             _logger.LogInformation("Usuário {nome} encontrado!", usuario.Nome);
             _logger.LogInformation("Processo finalizado com sucesso!");
-            SerilogConfig.Success("Processo finalizado com sucesso!");
+          //  SerilogConfig.Success("Processo finalizado com sucesso!");
             return Ok(usuario);
         }
 
