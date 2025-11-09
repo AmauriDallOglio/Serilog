@@ -17,6 +17,7 @@ namespace Serilog.Api.Controllers
             _logger = logger;
             _logger.LogInformation("#############################################################################");
             _logger.LogInformation("                            SerilogController                                ");
+            Log.Information("                            SerilogController                                ");
             _logger.LogInformation("#############################################################################");
             _logger.LogInformation($"Logger type: {_logger.GetType().FullName}");
         }
@@ -31,23 +32,22 @@ namespace Serilog.Api.Controllers
 
             _logger.LogInformation("-----------------------------------------------------------------------------");
             _logger.LogInformation("SerilogController: iniciado");
-            _logger.LogWarning("SerilogController: Chamou endpoint /api/teste/log");
+            _logger.LogInformation("SerilogController: Chamou endpoint /api/teste/log");
+            Log.Information("SerilogController: Chamou endpoint /api/teste/log");
             _logger.LogInformation("-----------------------------------------------------------------------------");
 
             _logger.LogWarning("-----------------------------------------------------------------------------");
             _logger.LogWarning("SerilogController: iniciou com um warning");
             _logger.LogWarning("SerilogController: Exemplo de warning");
+            Log.Warning("SerilogController: Exemplo de warning");
             _logger.LogWarning("-----------------------------------------------------------------------------");
 
             _logger.LogError("-----------------------------------------------------------------------------");
             _logger.LogError("SerilogController: iniciou com erro simulado");
-            _logger.LogWarning("SerilogController: Exemplo de erro");
+            _logger.LogError("SerilogController: Exemplo de erro");
+            Log.Error("SerilogController: Exemplo de erro");
             _logger.LogError("-----------------------------------------------------------------------------");
-
-            _logger.LogError("-----------------------------------------------------------------------------");
-            _logger.LogInformation($"Logger type: {_logger.GetType().FullName}");
-            _logger.LogError("-----------------------------------------------------------------------------");
-
+ 
 
             return Ok("Logs enviados!");
         }

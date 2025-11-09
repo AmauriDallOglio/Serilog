@@ -1,4 +1,5 @@
 ﻿using Serilog.Events;
+using System.Globalization;
 
 
 namespace Serilog.Api.Util
@@ -6,164 +7,100 @@ namespace Serilog.Api.Util
     public static class SerilogConfig
     {
  
- 
-        public static void ConfigurarSerilog()
+
+        public static void ConfigurarSerilog(WebApplicationBuilder builder)
         {
 
- 
-            // Obtenha a chave do Application Insights  variáveis de ambiente
+
+            // =====================================================================
+            // 🔹 1. Limpa provedores padrão e ativa console/debug para o pipeline
+            // =====================================================================
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole(); // visível no Azure Log Stream
+            builder.Logging.AddDebug();   // útil localmente
+
+            // =====================================================================
+            // 🔹 2. Define o ambiente (Azure x Local)
+            // =====================================================================
             string azure = Environment.GetEnvironmentVariable("LOG_AZURE") ?? string.Empty;
+
             if (!string.IsNullOrEmpty(azure))
             {
-
-                // Bootstrap logger para capturar logs iniciais
+                // Ambiente Azure (Log Stream ativo)
                 Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Debug()
                     .MinimumLevel.Information()
-                      .MinimumLevel.Verbose() // captura todos os níveis
-                      .MinimumLevel.Override("Microsoft", LogEventLevel.Warning) // Ignora logs de infra
-                      .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                      .MinimumLevel.Override("System", LogEventLevel.Warning)
-
-                    .WriteTo.Console()
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                    .WriteTo.Console(
+                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                    )
                     .WriteTo.File(
-                        path: @"D:\home\LogFiles\application_startup.log",
-                        rollingInterval: RollingInterval.Day)
-                    .CreateBootstrapLogger();
+                        path: @"D:\home\LogFiles\application_log-.txt",
+                        rollingInterval: RollingInterval.Day,
+                        restrictedToMinimumLevel: LogEventLevel.Information,
+                        shared: true
+                    )
+                    .CreateLogger();
 
-
-
-                //var loggerConfiguration = new LoggerConfiguration()
-                //   .MinimumLevel.Verbose() // Captura todos os níveis de log
-                //   .Enrich.FromLogContext();
-
-                //// --- CONFIGURAÇÃO PARA O AZURE ---
-                //Log.Information("Detectado ambiente Azure ({site}). Aplicando configuração de produção.", azure);
-
-                //// Escreve no Console/Trace para aparecer no Log Stream do Azure
-                //loggerConfiguration.WriteTo.Trace(LogEventLevel.Verbose);
-
-                //// Escreve em um arquivo persistente no Azure
-                //loggerConfiguration.WriteTo.File(
-                //    path: @"D:\home\LogFiles\log-de-producao-.txt",
-                //    rollingInterval: RollingInterval.Day,
-                //    restrictedToMinimumLevel: LogEventLevel.Information
-                //);
-
-                ////Log.Logger = new LoggerConfiguration()
-                ////    .MinimumLevel.Verbose()
-                ////    // Para ver no Log Stream
-                ////    .WriteTo.Console()
-                ////    // Para salvar em arquivos persistentes no Azure
-                ////    .WriteTo.File(
-                ////        path: @"D:\home\LogFiles\warning-and-above-.log",
-                ////        restrictedToMinimumLevel: LogEventLevel.Warning,
-                ////        rollingInterval: RollingInterval.Day)
-                ////    .CreateLogger();
-                Log.Information("----------------------------------------------------");
-                Log.Information("Program.ConfigurarSerilog: Log de teste no Azure Log Stream!");
-                Log.Information("----------------------------------------------------");
+                Log.Information("--------------------------------------------------------------------------------");
+                Log.Information("✅ Amauri Versão 1.9.3 ");
+                Log.Information("Ambiente: AZURE LOG STREAM ativo (LOG_AZURE detectado).");
+                Log.Information("--------------------------------------------------------------------------------");
             }
             else
             {
-
-
+                // Ambiente local (desenvolvimento)
                 Log.Logger = new LoggerConfiguration()
-                  .MinimumLevel.Information()
-                  .MinimumLevel.Verbose() // captura todos os níveis
-                  .MinimumLevel.Override("Microsoft", LogEventLevel.Warning) // Ignora logs de infra
-                  .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                  .MinimumLevel.Override("System", LogEventLevel.Warning)
+                    .MinimumLevel.Information()
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                    .WriteTo.Console(
+                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                    )
+                    .WriteTo.File(
+                        path: @"C:\Amauri\GitHub\logs\app-.log",
+                        rollingInterval: RollingInterval.Day,
+                        shared: true
+                    )
+                    .CreateLogger();
 
-                  .WriteTo.Console(
-                      outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-                  )
-                  .WriteTo.File(
-                      path: @"D:\home\LogFiles\application-log-.txt",
-                      rollingInterval: RollingInterval.Day,
-                      restrictedToMinimumLevel: LogEventLevel.Information,
-                      shared: true
-                  )
-                  .CreateLogger();
+                Log.Information("--------------------------------------------------------------------------------");
+                Log.Information("Ambiente local detectado (sem LOG_AZURE).");
+                Log.Information("--------------------------------------------------------------------------------");
+            }
 
-                Log.Information("-----------------------------------------------------------------");
-                Log.Information("Program.ConfigurarSerilog: Log Stream, não possui configuração no azure!");
-                Log.Information("-----------------------------------------------------------------");
+            // =====================================================================
+            // 🔹 3. Configura o host para usar Serilog
+            // =====================================================================
+            builder.Host.UseSerilog();
 
+            // =====================================================================
+            // 🔹 4. Ajuste de cultura e fuso horário
+            // =====================================================================
+            try
+            {
+                var culture = new CultureInfo("pt-BR");
+                CultureInfo.DefaultThreadCurrentCulture = culture;
+                CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-                ////Log.Logger = new LoggerConfiguration()
-                ////    .MinimumLevel.Verbose() // captura todos os níveis
-                //// Configuração do logger
-                //Log.Logger = new LoggerConfiguration()
-                //    .MinimumLevel.Verbose() // Captura todos os níveis
-                //    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning) // Ignora logs de infra
-                //    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                //    .MinimumLevel.Override("System", LogEventLevel.Warning)
+                TimeZoneInfo brZone;
+                try
+                {
+                    brZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time"); // Windows
+                }
+                catch (TimeZoneNotFoundException)
+                {
+                    brZone = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo"); // Linux
+                }
 
-                //    //// Apenas logs de Trace (nível mais baixo)
-                //    //.WriteTo.Logger(lc => lc
-                //    //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Verbose)
-                //    //    .WriteTo.File(
-                //    //        path: @"C:\Amauri\GitHub\logs\trace-.log",
-                //    //        rollingInterval: RollingInterval.Day,
-                //    //        retainedFileCountLimit: 30))
-
-                //    //// Logs Debug
-                //    //.WriteTo.Logger(lc => lc
-                //    //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Debug)
-                //    //    .WriteTo.File(
-                //    //        path: @"C:\Amauri\GitHub\logs\debug-.log",
-                //    //        rollingInterval: RollingInterval.Day,
-                //    //        retainedFileCountLimit: 30))
-
-                //    //// Logs Information
-                //    //.WriteTo.Logger(lc => lc
-                //    //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Information)
-                //    //    .WriteTo.File(
-                //    //        path: @"C:\Amauri\GitHub\logs\information-.log",
-                //    //        rollingInterval: RollingInterval.Day,
-                //    //        retainedFileCountLimit: 30))
-
-
-                //    //// Logs Warning (somente Warning)
-                //    //.WriteTo.Logger(lc => lc
-                //    //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Warning)
-                //    //    .WriteTo.File(
-                //    //        path: @"C:\Amauri\GitHub\logs\warning-.log",
-                //    //        rollingInterval: RollingInterval.Day,
-                //    //        retainedFileCountLimit: 30))
-
-                //    //// Logs Error (somente Error)
-                //    //.WriteTo.Logger(lc => lc
-                //    //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Error)
-                //    //    .WriteTo.File(
-                //    //        path: @"C:\Amauri\GitHub\logs\error-.log",
-                //    //        rollingInterval: RollingInterval.Day,
-                //    //        retainedFileCountLimit: 30))
-
-                //    //// Logs Critical (somente Fatal)
-                //    //.WriteTo.Logger(lc => lc
-                //    //    .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Fatal)
-                //    //    .WriteTo.File(
-                //    //        path: @"C:\Amauri\GitHub\logs\critical-.log",
-                //    //        rollingInterval: RollingInterval.Day,
-                //    //        retainedFileCountLimit: 30))
-
-
-
-                //    // Logs Warning e superiores em arquivo
-                //    .WriteTo.File(
-                //    path: @"C:\Amauri\GitHub\logs\warning-and-above-.log",
-                //    restrictedToMinimumLevel: LogEventLevel.Warning,
-                //    rollingInterval: RollingInterval.Day)
-                //// Todos os logs no console
-                //.WriteTo.Console()
-                //.CreateLogger();
-
-                //Log.Information("----------------------------------------------------");
-                //Log.Information("ConfigurarSerilog: Log Stream, não possui configuração no azure!");
-                //Log.Information("----------------------------------------------------");
-
+                var horaBrasil = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, brZone);
+                Log.Information("-----------------------------------------------------------------------------");
+                Log.Information("                            TimeZoneInfo                                     ");
+                Log.Information($" Hora do Brasil: {horaBrasil}");
+                Log.Information($" Timezone: {brZone.DisplayName}");
+                Log.Information("-----------------------------------------------------------------------------");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, " Falha ao configurar cultura e timezone pt-BR.");
             }
         }
 
