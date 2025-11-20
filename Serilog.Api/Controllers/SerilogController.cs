@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Serilog.Api.Util;
 using Serilog.Aplicacao.Dto;
 
 namespace Serilog.Api.Controllers
@@ -14,40 +15,44 @@ namespace Serilog.Api.Controllers
 
         public SerilogController(ILogger<SerilogController> logger)
         {
-            _logger = logger;
-            _logger.LogInformation("#############################################################################");
-            _logger.LogInformation("                            SerilogController                                ");
-            Log.Information("                            SerilogController                                ");
-            _logger.LogInformation("#############################################################################");
-            _logger.LogInformation($"Logger type: {_logger.GetType().FullName}");
+            ConfiguracaoLogger.Informacao("                            SerilogController                                ");
+
+            //_logger = logger;
+            //_logger.LogInformation("#############################################################################");
+            //_logger.LogInformation("                            SerilogController                                ");
+            //ConfiguracaoLogger.Informacao("                            SerilogController                                ");
+            //_logger.LogInformation("#############################################################################");
+            //_logger.LogInformation($"Logger type: {_logger.GetType().FullName}");
         }
 
 
-        [HttpGet("log")]
+        [HttpGet("LogTeste")]
         public IActionResult LogTeste()
         {
-            _logger.LogInformation("#############################################################################");
-            _logger.LogInformation("                              Rota: LogTeste                                 ");
-            _logger.LogInformation("#############################################################################");
+            ConfiguracaoLogger.Informacao("  Rota: LogTeste    ");
 
-            _logger.LogInformation("-----------------------------------------------------------------------------");
-            _logger.LogInformation("SerilogController: iniciado");
-            _logger.LogInformation("SerilogController: Chamou endpoint /api/teste/log");
-            Log.Information("SerilogController: Chamou endpoint /api/teste/log");
-            _logger.LogInformation("-----------------------------------------------------------------------------");
+            //_logger.LogInformation("#############################################################################");
+            //_logger.LogInformation("                              Rota: LogTeste                                 ");
+            //_logger.LogInformation("#############################################################################");
 
-            _logger.LogWarning("-----------------------------------------------------------------------------");
-            _logger.LogWarning("SerilogController: iniciou com um warning");
-            _logger.LogWarning("SerilogController: Exemplo de warning");
-            Log.Warning("SerilogController: Exemplo de warning");
-            _logger.LogWarning("-----------------------------------------------------------------------------");
+            //_logger.LogInformation("-----------------------------------------------------------------------------");
+            //_logger.LogInformation("SerilogController: iniciado");
+            //_logger.LogInformation("SerilogController: Chamou endpoint /api/teste/log");
+            //ConfiguracaoLogger.Informacao("SerilogController: Chamou endpoint /api/teste/log");
+            //_logger.LogInformation("-----------------------------------------------------------------------------");
 
-            _logger.LogError("-----------------------------------------------------------------------------");
-            _logger.LogError("SerilogController: iniciou com erro simulado");
-            _logger.LogError("SerilogController: Exemplo de erro");
-            Log.Error("SerilogController: Exemplo de erro");
-            _logger.LogError("-----------------------------------------------------------------------------");
- 
+            //_logger.LogWarning("-----------------------------------------------------------------------------");
+            //_logger.LogWarning("SerilogController: iniciou com um warning");
+            //_logger.LogWarning("SerilogController: Exemplo de warning");
+            //ConfiguracaoLogger.Alerta("SerilogController: Exemplo de warning");
+            //_logger.LogWarning("-----------------------------------------------------------------------------");
+
+            //_logger.LogError("-----------------------------------------------------------------------------");
+            //_logger.LogError("SerilogController: iniciou com erro simulado");
+            //_logger.LogError("SerilogController: Exemplo de erro");
+            //ConfiguracaoLogger.Erro("SerilogController: Exemplo de erro");
+            //_logger.LogError("-----------------------------------------------------------------------------");
+
 
             return Ok("Logs enviados!");
         }

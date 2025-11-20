@@ -14,11 +14,32 @@ namespace Serilog.Api
             {
                 var builder = WebApplication.CreateBuilder(args);
 
-                // Chama o configurador unificado de logging
-                SerilogConfig.ConfigurarSerilog(builder);
-                //builder.Logging.ClearProviders();
-                //builder.Logging.AddConsole();
-                //builder.Logging.AddDebug();
+
+
+
+
+
+                // Logging nativo do .NET
+                ConfiguracaoLogger.ConfigurarDotNetLogging(builder);
+                ConfiguracaoLogger.Informacao("Configuração de logging iniciada");
+                ConfiguracaoLogger.Informacao("Logger Informacao nativo em execução!");
+                ConfiguracaoLogger.Erro("Logger Error nativo em execução!");
+                ConfiguracaoLogger.Alerta("Logger Alerta nativo em execução!");
+
+
+
+
+                //// Chama o configurador unificado de logging
+                //SerilogConfig.ConfigurarSerilog(builder);
+                ////builder.Logging.ClearProviders();
+                ////builder.Logging.AddConsole();
+                ////builder.Logging.AddDebug();
+
+
+                // Habilitar Logs do EF Core (Queries SQL)
+
+                // builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Query", LogLevel.Debug);
+
 
                 builder.Services.AddControllers();
                 builder.Services.AddEndpointsApiExplorer();
@@ -30,7 +51,15 @@ namespace Serilog.Api
                 var app = builder.Build();
 
 
-                app.UseSerilogRequestLogging(); 
+
+                ConfiguracaoLogger.RegistrarLoggerViaApp(app);
+                ConfiguracaoLogger.Informacao("Logger Informacao nativo em execução!");
+                ConfiguracaoLogger.Erro("Logger Error nativo em execução!");
+                ConfiguracaoLogger.Alerta("Logger Alerta nativo em execução!");
+
+
+
+                //app.UseSerilogRequestLogging(); 
                 app.UseRouting();
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
@@ -48,11 +77,11 @@ namespace Serilog.Api
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "A aplicação falhou ao iniciar");
+                ConfiguracaoLogger.Erro($"A aplicação falhou ao iniciar: {ex.Message}");
             }
             finally
             {
-                Log.CloseAndFlush();
+                ConfiguracaoLogger.Erro($"A aplicação falhou");
             }
 
  
