@@ -15,6 +15,35 @@
 
         public async Task Invoke(HttpContext httpContext)
         {
+
+            _logger.LogInformation("****************************************************************************");
+            _logger.LogInformation("                            MiddlewareLog 2                                   ");
+            _logger.LogInformation("****************************************************************************");
+
+            _logger.LogInformation("-----------------------------------------------------------------------------");
+            _logger.LogInformation("MiddlewareLog:  [LogInformation]...");
+            _logger.LogInformation("-----------------------------------------------------------------------------");
+
+            _logger.LogWarning("-----------------------------------------------------------------------------");
+            _logger.LogWarning("MiddlewareLog:  [LogWarningg]...");
+            _logger.LogWarning("-----------------------------------------------------------------------------");
+
+            _logger.LogError("-----------------------------------------------------------------------------");
+            _logger.LogError("MiddlewareLog:  [LogError]...");
+            _logger.LogError("-----------------------------------------------------------------------------");
+
+            _logger.LogTrace("-----------------------------------------------------------------------------");
+            _logger.LogTrace("MiddlewareLog:  [LogTrace]...");
+            _logger.LogTrace("-----------------------------------------------------------------------------");
+
+            _logger.LogDebug("-----------------------------------------------------------------------------");
+            _logger.LogDebug("MiddlewareLog:  [LogDebug]...");
+            _logger.LogDebug("-----------------------------------------------------------------------------");
+
+
+
+
+
             switch (_nivel)
             {
                 // Detalhado → Trace, Debug, Information, Warning, Error

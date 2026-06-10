@@ -12,8 +12,7 @@ namespace Serilog.Api.Controllers
 
         public SerilogController(ILogger<SerilogController> logger)
         {
-            ConfiguracaoLogger.Informacao("                            SerilogController                                ");
-
+   
             //_logger = logger;
             //_logger.LogInformation("#############################################################################");
             //_logger.LogInformation("                            SerilogController                                ");
@@ -26,8 +25,7 @@ namespace Serilog.Api.Controllers
         [HttpGet("LogTeste")]
         public IActionResult LogTeste()
         {
-            ConfiguracaoLogger.Informacao("  Rota: LogTeste    ");
-
+       
             //_logger.LogInformation("#############################################################################");
             //_logger.LogInformation("                              Rota: LogTeste                                 ");
             //_logger.LogInformation("#############################################################################");

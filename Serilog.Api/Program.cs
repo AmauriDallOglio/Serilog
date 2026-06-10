@@ -21,15 +21,11 @@ namespace Serilog.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddHostedService<LoggerBackgroundService>(); // serviço de teste de logs
-                
-                
+
+            ConfiguracaoLogger.ConfigurarDotNetLogging(builder, configuration);
+
             var app = builder.Build();
-            ConfiguracaoLogger.RegistrarLoggerViaApp(app);
-            ConfiguracaoLogger.Informacao("Logger Informacao nativo em execução!");
-            ConfiguracaoLogger.Error("Logger Error nativo em execução!");
-            ConfiguracaoLogger.Alerta("Logger Alerta nativo em execução!");
-
-
+ 
             //app.UseSerilogRequestLogging(); 
             app.UseRouting();
             app.UseDeveloperExceptionPage();

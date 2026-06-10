@@ -33,10 +33,36 @@
         /// </summary>
         private void EmitirLogs()
         {
+
+
+
+            _logger.LogInformation("####################################################################");
+            _logger.LogInformation("MiddlewareLog:  [LogInformation]...");
+            _logger.LogInformation("####################################################################");
+
+            _logger.LogWarning("####################################################################");
+            _logger.LogWarning("MiddlewareLog:  [LogWarningg]...");
+            _logger.LogWarning("####################################################################");
+
+            _logger.LogError("####################################################################");
+            _logger.LogError("MiddlewareLog:  [LogError]...");
+            _logger.LogError("####################################################################");
+
+            _logger.LogTrace("####################################################################");
+            _logger.LogTrace("MiddlewareLog:  [LogTrace]...");
+            _logger.LogTrace("####################################################################");
+
+            _logger.LogDebug("####################################################################");
+            _logger.LogDebug("MiddlewareLog:  [LogDebug]...");
+            _logger.LogDebug("####################################################################");
+
+
+
             switch (_nivel)
             {
                 // Detalhado → Trace, Debug, Information, Warning, Error
                 case "Detalhado":
+                    _logger.LogError("----------------------------------------------------------");
                     _logger.LogTrace("------ [Detalhado]   LogTrace       — nível mais granular");
                     _logger.LogDebug("------ [Detalhado]   LogDebug       — diagnóstico detalhado");
                     _logger.LogInformation("------ [Detalhado]   LogInformation — fluxo normal");
@@ -47,6 +73,7 @@
 
                 // Informacoes → Information, Warning, Error
                 case "Informacoes":
+                    _logger.LogError("----------------------------------------------------------");
                     _logger.LogInformation("------ [Informacoes] LogInformation — fluxo normal");
                     _logger.LogWarning("------ [Informacoes] LogWarning     — situação inesperada");
                     _logger.LogError("------ [Informacoes] LogError       — falha recuperável");
@@ -55,6 +82,7 @@
 
                 // Aviso → Warning, Error
                 case "Aviso":
+                    _logger.LogError("----------------------------------------------------------");
                     _logger.LogWarning("------ [Aviso] LogWarning — situação inesperada");
                     _logger.LogError("------ [Aviso] LogError   — falha recuperável");
                     _logger.LogError("----------------------------------------------------------");
@@ -62,6 +90,7 @@
 
                 // Erro → apenas Error
                 case "Erro":
+                    _logger.LogError("----------------------------------------------------------");
                     _logger.LogError("------ [Erro] LogError — falha recuperável");
                     _logger.LogError("----------------------------------------------------------");
                     break;
