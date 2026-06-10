@@ -11,18 +11,16 @@ Projeto demonstrativo desenvolvido em **ASP.NET Core** com foco na implementaç�
 ─── Opções válidas para "Nivel" ───────────────────────────────────────────
 
 "Detalhado"   → Trace + Debug + Information + Warning + Error  (equivale a "Detalhado" no Azure App Service Logs)
-<img width="1017" height="434" alt="image" src="https://github.com/user-attachments/assets/76b60180-7b21-4c5e-84b5-966b76a97ee5" />
+<img width="1017" height="536" alt="image" src="https://github.com/user-attachments/assets/e5a119f8-a735-4ddc-9e8b-3ce32c609a11" />
 
 "Informacoes" → Information + Warning + Error  (equivale a "Informações" no Azure App Service Logs)
-<img width="1021" height="246" alt="image" src="https://github.com/user-attachments/assets/246c0bea-92a2-411f-bf6b-9dfdd17c76e1" />
-
+<img width="1023" height="296" alt="image" src="https://github.com/user-attachments/assets/ab070810-8a86-4c82-94f9-4b02802ad1b1" />
 
 "Aviso"       → Warning + Error  (equivale a "Aviso" no Azure App Service Logs)
-<img width="1062" height="545" alt="image" src="https://github.com/user-attachments/assets/251c9f6c-72af-4831-bd0f-55379b2dd397" />
+<img width="1013" height="177" alt="image" src="https://github.com/user-attachments/assets/1b707f50-ac71-4648-b1ab-4647426f6a2d" />
 
  "Erro"        → Error apenas             (equivale a "Erro" no Azure App Service Logs)
-<img width="1064" height="340" alt="image" src="https://github.com/user-attachments/assets/a7347976-6ab0-4b82-ab0a-543faf741616" />
-
+ <img width="1009" height="183" alt="image" src="https://github.com/user-attachments/assets/c35d1f8c-30b8-4ab0-9d4e-8d950a708683" />
 
 ────────────────────────────────────────────────────────────────────────────
 
