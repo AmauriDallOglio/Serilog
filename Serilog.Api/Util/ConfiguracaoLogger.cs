@@ -56,15 +56,8 @@ namespace Serilog.Api.Util
             // Filtros
             ConfigurarFiltros(builder, nivelGlobal);
 
-            // Logger temporário
-            _loggerTemp = CriarLoggerTemporario(nivelGlobal);
-            _loggerTemp.LogInformation(
-                "------ Logging configurado | Ativado: {Ativado} | Nível Global: {Nivel} ({LogLevel}) | Nível Azure: {NivelAzure} ({LogLevelAzure})",
-                appSettings.ConfiguracoesLog.Ativado,
-                appSettings.ConfiguracoesLog.Nivel,
-                nivelGlobal,
-                appSettings.ConfiguracoesLog.NivelAzure ?? appSettings.ConfiguracoesLog.Nivel,
-                nivelAzure);
+
+
         }
 
         private static void ConfigurarFiltros(WebApplicationBuilder builder, LogLevel nivelGlobal)
@@ -73,31 +66,43 @@ namespace Serilog.Api.Util
             builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
             builder.Logging.AddFilter("System", LogLevel.Warning);
 
-            LogLevel nivelEfCore = nivelGlobal == LogLevel.Trace ? LogLevel.Debug : LogLevel.None;
-            builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", nivelEfCore);
-            builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Query", nivelEfCore);
+ 
+            builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", nivelGlobal);
+            builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Query", nivelGlobal);
         }
 
-        private static ILogger CriarLoggerTemporario(LogLevel nivelGlobal) =>
-            LoggerFactory.Create(logging =>
-            {
-                logging.AddConsole();
-                logging.SetMinimumLevel(nivelGlobal);
-            }).CreateLogger("ConfiguracaoLogger");
 
-        private static LogLevel MapearNivel(string nivel) => nivel switch
+
+        private static LogLevel MapearNivel(string nivel)
         {
-            "Detalhado" => LogLevel.Trace,
-            "Informacoes" => LogLevel.Information,
-            "Aviso" => LogLevel.Warning,
-            "Erro" => LogLevel.Error,
-            _ => LogLevel.Information
-        };
+            switch (nivel)
+            {
+                case "Detalhado":
+                    // Trace + Debug + Information + Warning + Error + Critical
+                    return LogLevel.Trace;
 
- 
-         
-         
-         
+                case "Informacoes":
+                    // Information + Warning + Error + Critical
+                    return LogLevel.Information;
+
+                case "Aviso":
+                    // Warning + Error + Critical
+                    return LogLevel.Warning;
+
+                case "Erro":
+                    // Error + Critical
+                    return LogLevel.Error;
+
+                default:
+                    // Padrão seguro
+                    return LogLevel.Information;
+            }
+        }
+
+
+
+
+
 
         //// ================================================================
         ////  CONFIGURAÇÃO DO SERILOG
@@ -169,14 +174,10 @@ namespace Serilog.Api.Util
         //}
 
 
-        // ================================================================
-        // 2. Abre um canal para registrar o ILogger na classe
-        // ================================================================
 
- 
- 
 
- 
+
+
 
     }
 }
