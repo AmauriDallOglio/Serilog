@@ -1,9 +1,124 @@
-﻿namespace Serilog.Api.Util
+﻿using Microsoft.Extensions.Logging.AzureAppServices;
+using Serilog.Aplicacao.Dto;
+
+namespace Serilog.Api.Util
 {
     public static class ConfiguracaoLogger
     {
-        private static ILogger? _loggerDotNet;
+ 
         private static ILogger? _loggerTemp;
+
+        public static void ConfigurarDotNetLogging(WebApplicationBuilder builder, IConfiguration configuration)
+        {
+            AppSettingsDto? appSettings = configuration.Get<AppSettingsDto>();
+
+            if (appSettings is null)
+            {
+                Console.WriteLine("[ConfiguracaoLogger] AVISO: AppSettingsDto não pôde ser lido. Logging padrão mantido.");
+                return;
+            }
+
+            // Remove todos os provedores padrão (Console, Debug, EventLog, etc.)
+            builder.Logging.ClearProviders();
+
+            if (!appSettings.ConfiguracoesLog.Ativado)
+            {
+                Console.WriteLine("[ConfiguracaoLogger] Logging DESATIVADO via appsettings.");
+                return;
+            }
+
+            // ---------------------------------------------------------------
+            // Provedores
+            // ---------------------------------------------------------------
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
+            builder.Logging.AddAzureWebAppDiagnostics();        // Azure App Service Logs (filesystem + blob)
+            builder.Services.AddApplicationInsightsTelemetry(); // Application Insights
+
+            // ---------------------------------------------------------------
+            // Nível global — aplicado ao Console e Debug
+            // ---------------------------------------------------------------
+            LogLevel nivelGlobal = MapearNivel(appSettings.ConfiguracoesLog.Nivel);
+            builder.Logging.SetMinimumLevel(nivelGlobal);
+
+            // ---------------------------------------------------------------
+            // Nível exclusivo para o Fluxo de log do Azure App Service
+            // Se NivelAzure não for informado, herda o mesmo nível global
+            // ---------------------------------------------------------------
+            LogLevel nivelAzure = appSettings.ConfiguracoesLog.NivelAzure is not null
+                ? MapearNivel(appSettings.ConfiguracoesLog.NivelAzure)
+                : nivelGlobal;
+
+
+
+            // Adiciona provider de logs do Azure App Service
+            builder.Logging.AddAzureWebAppDiagnostics();
+
+
+
+            // Configurações do arquivo de log no filesystem do Azure
+            builder.Services.Configure<AzureFileLoggerOptions>(options =>
+            {
+                options.FileName = "app-log-"; // prefixo do arquivo gerado
+                options.FileSizeLimit = 50 * 1024;  // 50 KB por arquivo
+                options.RetainedFileCountLimit = 5;          // mantém os 5 arquivos mais recentes
+            });
+
+            // Configurações do blob de log no Azure Storage (opcional)
+            builder.Services.Configure<AzureBlobLoggerOptions>(options =>
+            {
+                options.BlobName = "app-log.txt";
+            });
+
+            // ---------------------------------------------------------------
+            // Filtros por categoria — evita flood de logs internos do .NET/ASP.NET
+            // ---------------------------------------------------------------
+            builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
+            builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
+            builder.Logging.AddFilter("System", LogLevel.Warning);
+
+            // EF Core: exibe queries SQL apenas no nível Detalhado (Trace)
+            LogLevel nivelEfCore = nivelGlobal == LogLevel.Trace ? LogLevel.Debug : LogLevel.None;
+            builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", nivelEfCore);
+            builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Query", nivelEfCore);
+
+            // ---------------------------------------------------------------
+            // Logger temporário para mensagens ANTES do app.Build()
+            // (o ILogger do DI ainda não está disponível neste momento)
+            // ---------------------------------------------------------------
+            ILogger loggerTemp = LoggerFactory
+                .Create(logging =>
+                {
+                    logging.AddConsole();
+                    logging.SetMinimumLevel(nivelGlobal);
+                })
+                .CreateLogger("ConfiguracaoLogger");
+
+            loggerTemp.LogInformation(
+                "------ Logging configurado | Ativado: {Ativado} | Nível Global: {Nivel} ({LogLevel}) | Nível Azure: {NivelAzure} ({LogLevelAzure})",
+                appSettings.ConfiguracoesLog.Ativado,
+                appSettings.ConfiguracoesLog.Nivel,
+                nivelGlobal,
+                appSettings.ConfiguracoesLog.NivelAzure ?? appSettings.ConfiguracoesLog.Nivel,
+                nivelAzure);
+        }
+
+
+
+
+        // -----------------------------------------------------------------------
+        // Mapeamento de string → LogLevel (espelha o portal do Azure)
+        // -----------------------------------------------------------------------
+        private static LogLevel MapearNivel(string nivel) => nivel switch
+        {
+            "Detalhado" => LogLevel.Trace,       // Trace + Debug + Info + Warning + Error
+            "Informacoes" => LogLevel.Information,  // Info + Warning + Error
+            "Aviso" => LogLevel.Warning,      // Warning + Error
+            "Erro" => LogLevel.Error,        // Apenas Error
+            _ => LogLevel.Information   // Padrão seguro
+        };
+
+
 
         // ================================================================
         //  CONFIGURAÇÃO DO LOG NATIVO .NET
@@ -142,16 +257,16 @@
             var logger = app.Services.GetRequiredService<ILogger<Program>>();
             RegistrarLogger(logger);
 
-            _loggerDotNet?.LogInformation("-------------------------------------");
+            _loggerTemp?.LogInformation("-------------------------------------");
             Informacao("Aplicação iniciada!");
             _loggerTemp?.LogInformation(" Migrando do logger temporário para o logger final.");
-            _loggerDotNet?.LogInformation("-------------------------------------");
+            _loggerTemp?.LogInformation("-------------------------------------");
 
         }
 
         private static void RegistrarLogger(ILogger logger)
         {
-            _loggerDotNet = logger;
+            _loggerTemp = logger;
         }
 
 
@@ -163,7 +278,7 @@
         public static void Informacao(string mensagem)
         {
             //Log.Information(mensagem);
-            (_loggerDotNet ?? _loggerTemp)?.LogInformation(mensagem);
+            (_loggerTemp ?? _loggerTemp)?.LogInformation(mensagem);
             Colorir(mensagem, ConsoleColor.Black, ConsoleColor.Green);
         }
 
@@ -171,15 +286,15 @@
         {
             var mensagemTmp = $"SUCESSO: {mensagem}";
             //Log.Information(mensagemTmp);
-            (_loggerDotNet ?? _loggerTemp)?.LogInformation(mensagemTmp);
+            (_loggerTemp ?? _loggerTemp)?.LogInformation(mensagemTmp);
             Colorir(mensagemTmp, ConsoleColor.Black, ConsoleColor.Cyan);
         }
 
-        public static void Erro(string mensagem)
+        public static void Error(string mensagem)
         {
             var mensagemTmp = $"Erro: {mensagem}";
             // Log.Error(mensagemTmp);
-            (_loggerDotNet ?? _loggerTemp)?.LogError(mensagemTmp);
+            (_loggerTemp)?.LogError(mensagemTmp);
             Colorir(mensagemTmp, ConsoleColor.White, ConsoleColor.Red);
         }
 
@@ -187,7 +302,7 @@
         {
             var mensagemTmp = $"Alerta: {mensagem}";
             // Log.Warning(mensagemTmp);
-            (_loggerDotNet ?? _loggerTemp)?.LogWarning(mensagemTmp);
+            (_loggerTemp)?.LogWarning(mensagemTmp);
             Colorir(mensagemTmp, ConsoleColor.Black, ConsoleColor.Yellow);
         }
 
@@ -195,7 +310,7 @@
         {
             var mensagemTmp = $"Detalhado: {mensagem}";
             //Log.Debug(mensagemTmp);
-            (_loggerDotNet ?? _loggerTemp)?.LogDebug(mensagemTmp);
+            (_loggerTemp)?.LogDebug(mensagemTmp);
             Colorir(mensagemTmp, ConsoleColor.DarkGray, ConsoleColor.Black);
         }
 
