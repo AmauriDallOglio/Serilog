@@ -42,6 +42,7 @@
                     _logger.LogInformation("------ [Detalhado]   LogInformation — fluxo normal");
                     _logger.LogWarning("------ [Detalhado]   LogWarning     — situação inesperada");
                     _logger.LogError("------ [Detalhado]   LogError       — falha recuperável");
+                    _logger.LogError("----------------------------------------------------------");
                     break;
 
                 // Informacoes → Information, Warning, Error
@@ -49,17 +50,20 @@
                     _logger.LogInformation("------ [Informacoes] LogInformation — fluxo normal");
                     _logger.LogWarning("------ [Informacoes] LogWarning     — situação inesperada");
                     _logger.LogError("------ [Informacoes] LogError       — falha recuperável");
+                    _logger.LogError("----------------------------------------------------------");
                     break;
 
                 // Aviso → Warning, Error
                 case "Aviso":
                     _logger.LogWarning("------ [Aviso] LogWarning — situação inesperada");
                     _logger.LogError("------ [Aviso] LogError   — falha recuperável");
+                    _logger.LogError("----------------------------------------------------------");
                     break;
 
                 // Erro → apenas Error
                 case "Erro":
                     _logger.LogError("------ [Erro] LogError — falha recuperável");
+                    _logger.LogError("----------------------------------------------------------");
                     break;
 
                 // Fallback para qualquer valor não mapeado

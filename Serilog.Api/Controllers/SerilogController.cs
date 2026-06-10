@@ -8,10 +8,7 @@ namespace Serilog.Api.Controllers
     [ApiController]
     public partial class SerilogController : ControllerBase
     {
-
-
         private readonly ILogger<SerilogController> _logger;
-
 
         public SerilogController(ILogger<SerilogController> logger)
         {

@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-
-namespace Serilog.Api.Util
+﻿namespace Serilog.Api.Util
 {
     public class MiddlewareLog
     {
@@ -13,14 +11,10 @@ namespace Serilog.Api.Util
             _next = next;
             _logger = logger;
             _nivel = configuration.GetSection("ConfiguracoesLog")["Nivel"] ?? "Informacoes";
-
         }
 
         public async Task Invoke(HttpContext httpContext)
         {
-
-
-
             switch (_nivel)
             {
                 // Detalhado → Trace, Debug, Information, Warning, Error
