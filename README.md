@@ -6,6 +6,29 @@ Projeto demonstrativo desenvolvido em **ASP.NET Core** com foco na implementaç�
 
 <img width="1896" height="948" alt="image" src="https://github.com/user-attachments/assets/13b5d3fc-e755-4ade-ba51-e4f769ce5e63" />
 
+
+
+─── Opções válidas para "Nivel" ───────────────────────────────────────────
+
+"Detalhado"   → Trace + Debug + Information + Warning + Error  (equivale a "Detalhado" no Azure App Service Logs)
+<img width="1017" height="434" alt="image" src="https://github.com/user-attachments/assets/76b60180-7b21-4c5e-84b5-966b76a97ee5" />
+
+"Informacoes" → Information + Warning + Error  (equivale a "Informações" no Azure App Service Logs)
+<img width="1021" height="246" alt="image" src="https://github.com/user-attachments/assets/246c0bea-92a2-411f-bf6b-9dfdd17c76e1" />
+
+
+"Aviso"       → Warning + Error  (equivale a "Aviso" no Azure App Service Logs)
+<img width="1062" height="545" alt="image" src="https://github.com/user-attachments/assets/251c9f6c-72af-4831-bd0f-55379b2dd397" />
+
+ "Erro"        → Error apenas             (equivale a "Erro" no Azure App Service Logs)
+<img width="1064" height="340" alt="image" src="https://github.com/user-attachments/assets/a7347976-6ab0-4b82-ab0a-543faf741616" />
+
+
+────────────────────────────────────────────────────────────────────────────
+
+
+
+
 Demonstrar na prática como configurar e validar um fluxo completo de logs em uma aplicação Web API, incluindo:
 
 - Registro de logs em diferentes níveis (Information, Warning, Error)
